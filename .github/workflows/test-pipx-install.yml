@@ -1,0 +1,48 @@
+name: Test pipx installer on default Ubuntu Python
+
+on:
+  push:
+    paths:
+      - install_pipx.py
+      - .github/workflows/test-pipx-install.yml
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-pipx:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04, ubuntu-24.04]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Confirm default Python version
+        run: |
+          echo "System Python version:"
+          python3 --version
+          which python3
+
+      - name: Check if pip is installed
+        run: |
+          if ! command -v pip3 >/dev/null; then
+            echo "pip3 not found (expected on minimal install)"
+          else
+            pip3 --version
+          fi
+
+      - name: Run pipx installer script (no sudo, no env vars)
+        run: |
+          python3 install_pipx.py
+
+      - name: Validate pipx installation
+        run: |
+          ~/.local/bin/pipx --version
+          ~/.local/bin/pipx list
+
+      - name: Try installing a test package with pipx
+        run: |
+          ~/.local/bin/pipx install cowsay
+          ~/.local/bin/cowsay "pipx is working!"
