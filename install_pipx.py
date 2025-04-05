@@ -60,7 +60,7 @@ def main() -> None:
     run([str(venv_pip), "install", "pipx"])
 
     print("[+] Using bootstrap pipx to install user pipx")
-    run([str(venv_pipx), "install", "pipx"])
+    run([str(venv_pipx), "install", "pipx", "--force", "--include-deps"])
 
     if not pipx_target_bin.exists():
         print("[-] pipx installation failed", file=sys.stderr)
